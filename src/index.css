@@ -1,0 +1,340 @@
+/* Fondo general del body */
+.body {
+  background-color: hsla(215, 56%, 41%, 0.788);
+}
+
+/* Bordes redondeados para inputs de login */
+.inputLogin1 {
+  border-radius: 0.375rem 0.375rem 0rem 0rem !important;
+}
+.inputLogin2 {
+  border-radius: 0rem 0rem 0.375rem 0.375rem !important;
+}
+
+/* Estilo para el contenedor de login */
+.login {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+}
+
+/* Color del título */
+.color-title {
+  color: hsla(215, 56%, 41%, 0.788);
+}
+
+/* Fondo blanco para el login */
+.bg-login {
+  background-color: white;
+}
+
+/* Fondo del header */
+header {
+  background-color: #fff;
+}
+
+/* Tipografía y fondo para secciones tipo material */
+.mat-typography {
+  background-color: #9EBBE4;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0px 0px 50px 0px;
+  width: 100%;
+}
+
+/* Scroll personalizado */
+::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background-color: white;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #004884;
+  border-radius: 10px;
+}
+
+/* Botones primarios */
+.btn-primary {
+  background-color: #2E5EA1;
+  border-color: #2E5EA1;
+}
+.bg-primary {
+  background-color: #2E5EA1 !important;
+  border-color: #fff;
+}
+.bg-activity {
+  background-color: #6F8FC1 !important;
+  border-color: #fff;
+}
+.btn-primary2 {
+  background-color: #9EBBE4;
+}
+
+/* Acordeón */
+.accordion-button {
+  background: rgb(46, 94, 161);
+  border-radius: 0px !important;
+  margin-top: 3px;
+  color: #f7f7f7 !important;
+  font-weight: 700;
+}
+.accordion-button:not(.collapsed) {
+  background-color: #2E5EA1;
+}
+.accordion-item {
+  border: none;
+}
+.accordion-collapse {
+  border: none;
+}
+.accordion-button:focus {
+  box-shadow: none;
+  border-color: rgba(0, 0, 0, 0.125);
+}
+.accordion-body {
+  background-color: rgba(158, 187, 228, 0.3);
+}
+
+/* Títulos */
+.titulo {
+  color: #2E5EA1;
+  font-weight: 800;
+}
+
+/* Centrados */
+.center-text,
+.centrar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.centrarY {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* Botones y contenedores */
+.admin {
+  background-color: transparent;
+  color: #2E5EA1;
+  border: none;
+  float: right;
+  margin-right: 20px;
+}
+.presupuesto {
+  padding: 0 !important;
+}
+.espacioBoton {
+  width: 50px;
+}
+.alto {
+  min-height: 100% !important;
+}
+.activeM {
+  background-color: #9993 !important;
+}
+.activeM a {
+  color: black !important;
+}
+.bordeRojo {
+  border: 1px solid red;
+}
+
+/* Texto */
+.text-justify {
+  text-align: justify !important;
+}
+.fs-7 {
+  font-size: 14px;
+}
+.fs-20 {
+  font-size: 20px;
+}
+.fs-50 {
+  font-size: 30px;
+}
+
+/* Anchos personalizados */
+.wb-2 {
+  width: 40px;
+  border-radius: 0;
+}
+.bg-gris {
+  background-color: rgb(173, 167, 167);
+}
+.m-auto {
+  margin: auto;
+}
+.w-90 {
+  width: 90%;
+}
+.w-40 {
+  width: 40%;
+}
+.w-10 {
+  width: 10%;
+}
+.w-100 {
+  width: 100%;
+}
+
+/* Responsivo */
+@media (min-width: 1200px) {
+  .w-30 {
+    width: 30%;
+  }
+}
+@media (min-width: 500px) {
+  .w_50 {
+    width: 50%;
+  }
+}
+@media (max-width: 500px) {
+  .w_50 {
+    width: 90%;
+  }
+}
+
+/* Alturas */
+.h-72 {
+  height: 72vh !important;
+}
+.h-85 {
+  height: 85vh !important;
+}
+.h-50 {
+  height: 10vh !important;
+}
+
+/* Modales */
+.bs-modal-width {
+  --bs-modal-width: 80%;
+}
+.bs-modal-width2 {
+  --bs-modal-width: 50%;
+}
+
+/* Iconos y botones */
+.info {
+  height: 30px;
+  width: 30px;
+  color: gray;
+  font-size: 13px !important;
+  margin-left: 15px;
+  font-style: italic;
+}
+.rounded-6 {
+  border-radius: 100%;
+}
+.pointer {
+  cursor: pointer;
+}
+
+/* Indicador de nuevo */
+.new {
+  position: relative;
+}
+.new::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(72, 255, 0, 0.384);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Cargando */
+.conten-charging {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+.charging {
+  width: 70px;
+  height: 70px;
+  font-size: 50px;
+}
+
+/* Navegación */
+.nav-item a {
+  font-size: 1.3rem;
+}
+.boton-salir {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-salir {
+  background-color: transparent;
+  border: none;
+  font-size: 1.3rem;
+  color: var(--bs-nav-link-color);
+}
+
+/* Sticky navbar */
+.navbar-sticky-on {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  right: 0;
+  animation: fadeInDown .5s;
+  width: 100%;
+  box-shadow: 0px 0px 40px rgba(83, 88, 93, 0.2);
+}
+
+/* Animación de entrada */
+@-webkit-keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Títulos sin margen */
+h1, h2, h3, h4, h5, h6 {
+  max-width: 100% !important;
+  margin: 0px !important;
+  padding: 0px !important;
+}
+
+/* Scroll vertical */
+.scroll {
+  overflow-y: scroll;
+  white-space: normal;
+}
+
+/* Columnas personalizadas */
+.col-50 {
+  width: 50px;
+}
+
+/* Texto en mayúsculas */
+.mayuscula {
+  text-transform: uppercase;
+}
