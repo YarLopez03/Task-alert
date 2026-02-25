@@ -1,7 +1,19 @@
 import Menu from "./Menu";
 import { useState } from 'react'
+import {
+    createTask,
+    getTasksByUser,
+    updateTask,
+    deleteTask,
+    toggleTaskStatus
+} from "../services/taskService";
+import { getCategoriesByUser } from "../services/categoryService"
+import { useEffect } from "react";
 
 function ListTask() {
+
+    const userId = localStorage.getItem('user_id');
+
     // Estado para controlar la acción actual (crear o editar)
     const [accion, setAccion] = useState('');
 
@@ -9,52 +21,48 @@ function ListTask() {
     const [indice, setIndice] = useState('');
 
     // Estado para manejar los datos del formulario de tareas
-    const [formData, setFormData] = useState({
-        id: 0,
-        tarea: '',
-        categoria: "",        // ID de la categoría asociada
-        fechaInicio: '',      // Fecha de inicio de la tarea
-        fechaFin: ''          // Fecha de finalización de la tarea
-    });
+    const [formData, setFormData] = useState(
+        {
+            TASKNAME: '',
+            CATEGORIES_ID: "",
+            STARTDAY: '',
+            ENDDAY: ''
+        }
+    );
+
 
     // Estado que contiene la lista de tareas registradas
-    const [tareas, setTareas] = useState([
-        {
-            id: 1,
-            categoria: 1,
-            tarea: 'Tarea 1',
-            fechaInicio: '2025-01-01',
-            fechaFin: '2025-01-31'
-        },
-        {
-            id: 2,
-            categoria: 2,
-            tarea: 'Tarea 2',
-            fechaInicio: '2025-02-01',
-            fechaFin: '2025-02-28'
-        },
-        {
-            id: 3,
-            categoria: 3,
-            tarea: 'Tarea 3',
-            fechaInicio: '2025-03-01',
-            fechaFin: '2025-03-31'
-        },
-        {
-            id: 4,
-            categoria: 3,
-            tarea: 'Tarea 4',
-            fechaInicio: '2025-04-01',
-            fechaFin: '2025-04-30'
-        },
-    ]);
+
+    const [tareas, setTareas] = useState([]);
+
+    useEffect(() => {
+        listarTareas();
+    }, []);
+
+    const listarTareas = async () => {
+        try {
+            const response = await getTasksByUser(userId);
+            setTareas(response.data);
+        } catch (error) {
+            console.error("Error al listar tareas:", error);
+        }
+    };
 
     // Lista fija de categorías disponibles (no está en estado porque no se modifica)
-    var listCategoria = [
-        { id: 1, nombre: 'Categoria 1', diasAlerta: 4 },
-        { id: 2, nombre: 'Categoria 2', diasAlerta: 4 },
-        { id: 3, nombre: 'Categoria 3', diasAlerta: 4 },
-    ];
+    const [listCategoria, setCategoria] = useState([]);
+
+    useEffect(() => {
+        listarCategoria();
+    }, []);
+
+    const listarCategoria = async () => {
+        try {
+            const response = await getCategoriesByUser(userId);
+            setCategoria(response.data);
+        } catch (error) {
+            console.error("Error al listar categorias:", error);
+        }
+    };
 
     // Función para llenar los campos del formulario con los datos de una tarea seleccionada
     const llenarCampos = (indice) => {
@@ -65,67 +73,86 @@ function ListTask() {
 
     // Función para cerrar el modal usando Bootstrap
     const cerrarModal = () => {
-        const modalElement = document.getElementById('modal'); // Obtiene el elemento del modal
-        const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-        modalInstance.hide(); // Cierra el modal
+        const modalElement = document.getElementById('modal');
+        const modalInstance =
+            bootstrap.Modal.getInstance(modalElement) ||
+            new bootstrap.Modal(modalElement);
+
+        // 🔥 Quitar foco antes de cerrar
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
+
+        modalInstance.hide();
     };
 
     // Función para limpiar los campos del formulario (usado al crear una nueva tarea)
     const limpiarCampos = () => {
         const taskLimpia = {
-            id: 0,
-            tarea: '',
-            categoria: "",
-            fechaInicio: '',
-            fechaFin: ''
+            TASKNAME: '',
+            CATEGORIES_ID: "",
+            STARTDAY: '',
+            ENDDAY: ''
         };
         setFormData(taskLimpia); // Reinicia el formulario con valores vacíos
     };
 
     // Función para guardar los datos de una tarea (crear, editar o prorrogar)
-    const guardarDatos = () => {
-        // Muestra una alerta de confirmación antes de guardar
+    const guardarDatos = async () => {
+
+        // 🔥 Quitar foco del elemento activo
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
+
+        // 🔥 Esperar un pequeño tick para que React procese el blur
+        await new Promise(resolve => setTimeout(resolve, 0));
+
         Swal.fire({
-            text: "Seguro que desea " + accion + " la tarea", // Mensaje dinámico según la acción
+            text: "Seguro que desea " + accion + " la tarea",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "¡Sí, " + accion + "!"
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                // Ejecuta la acción correspondiente
-                switch (accion) {
-                    case 'crear':
-                        // Agrega la nueva tarea al array existente
-                        setTareas(prev => [...prev, formData]);
-                        break;
-                    case 'editar':
-                        // Crea una copia del array de tareas
-                        const tareaEditar = [...tareas];
-                        // Reemplaza la tarea en la posición indicada
-                        tareaEditar[indice] = formData;
-                        // Actualiza el estado con la nueva lista
-                        setTareas(tareaEditar);
-                        break;
-                    case 'prorrogar':
-                        // Similar a editar, pero puede tener lógica distinta si se desea
-                        const tareaProrrogar = [...tareas];
-                        tareaProrrogar[indice] = formData;
-                        setTareas(tareaProrrogar);
-                        break;
-                    default:
-                        console.log('Acción no reconocida');
+                try {
+
+                    switch (accion) {
+
+                        case 'crear':
+                            const data = {
+                                ...formData,
+                                USERS_ID: parseInt(userId)
+                            };
+                            await createTask(data);
+                            break;
+
+                        case 'editar':
+                            await updateTask(formData.ID, userId, formData);
+                            break;
+
+                        case 'prorrogar':
+                            await toggleTaskStatus(formData.ID, userId, formData);
+                            break;
+                    }
+
+                    await listarTareas();
+                    cerrarModal();
+                    limpiarCampos();
+
+                } catch (error) {
+                    console.error("Error al guardar:", error);
                 }
-                // Cierra el modal después de guardar
-                cerrarModal();
             }
         });
     };
 
     // Función para eliminar una tarea del listado
     const eliminarTarea = (indiceEliminar) => {
-        // Muestra una alerta de confirmación antes de eliminar
+
+        const tarea = tareas[indiceEliminar];
         Swal.fire({
             text: "¿Seguro que desea eliminar la tarea?",
             icon: "warning",
@@ -133,12 +160,14 @@ function ListTask() {
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "Sí, eliminar!"
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                // Filtra el array de tareas excluyendo la tarea seleccionada
-                const tareaEliminar = tareas.filter((_, index) => index !== indiceEliminar);
-                // Actualiza el estado con la nueva lista
-                setTareas(tareaEliminar);
+                try {
+                    await deleteTask(tarea.ID, userId);
+                    await listarTareas();
+                } catch (error) {
+                    console.error("Error al eliminar:", error);
+                }
             }
         });
     };
@@ -203,10 +232,10 @@ function ListTask() {
 
                 {tareas.map((tarea, indice) => {
                     // Busca la categoría correspondiente por ID
-                    const categoria = listCategoria.find(cat => cat.id === tarea.categoria);
+                    const categoria = listCategoria.find(cat => cat.ID === tarea.CATEGORIES_ID);
 
                     return (
-                        <div className="row ms-2 me-2" key={tarea.id}>
+                        <div className="row ms-2 me-2" key={tarea.ID}>
                             {/* Número de fila */}
                             <div className="col-1 border bg-white p-1 position-relative">
                                 <p className="centrar">{indice + 1}</p>
@@ -214,22 +243,22 @@ function ListTask() {
 
                             {/* Nombre de la categoría (solo visible en pantallas grandes) */}
                             <div className="col-2 border bg-white p-1 d-none d-lg-block position-relative">
-                                <p className="centrar">{categoria.nombre}</p>
+                                <p className="centrar">{categoria ? categoria.CATEGORYNAME : "Sin categoría"}</p>
                             </div>
 
                             {/* Nombre de la tarea */}
                             <div className="col-6 col-md border bg-white p-1 position-relative">
-                                <p className="centrar">{tarea.tarea}</p>
+                                <p className="centrar">{tarea.TASKNAME}</p>
                             </div>
 
                             {/* Fecha de inicio */}
                             <div className="col-1 border bg-white p-1 position-relative d-none d-lg-block">
-                                <p className="centrar">{tarea.fechaInicio}</p>
+                                <p className="centrar">{tarea.STARTDAY}</p>
                             </div>
 
                             {/* Fecha de fin */}
                             <div className="col-1 col-lg-1 border bg-white position-relative d-none d-lg-block">
-                                <p className="centrar">{tarea.fechaFin}</p>
+                                <p className="centrar">{tarea.ENDDAY}</p>
                             </div>
 
                             {/* Botones de acción */}
@@ -278,19 +307,22 @@ function ListTask() {
                             </div>
 
                             {/* Formulario de tarea */}
-                            <form id="formulario" action={guardarDatos}>
+                            <form id="formulario" onSubmit={(e) => {
+                                e.preventDefault();
+                                guardarDatos();
+                            }}>
                                 <div className="modal-body">
                                     {/* Selector de categoría */}
                                     <div className="mb-3">
                                         <div className="form-floating">
-                                            <select className="form-select" id="categoria"
-                                                value={formData.categoria}
+                                            <select className="form-select" id="CATEGORIES_ID"
+                                                value={formData.CATEGORIES_ID}
                                                 disabled={accion === "prorrogar"}
-                                                onChange={(e) => setFormData(prev => ({ ...prev, categoria: parseInt(e.target.value) }))}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, CATEGORIES_ID: parseInt(e.target.value) }))}
                                                 required>
                                                 <option value="" disabled>Seleccione una categoría</option>
                                                 {listCategoria.map((cat) => (
-                                                    <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+                                                    <option key={cat.ID} value={cat.ID}>{cat.CATEGORYNAME}</option>
                                                 ))}
                                             </select>
                                             <label>Categoría</label>
@@ -300,10 +332,10 @@ function ListTask() {
                                     {/* Campo de nombre de tarea */}
                                     <div className="mb-3">
                                         <div className="form-floating">
-                                            <textarea className="form-control" id="tarea"
-                                                value={formData.tarea}
+                                            <textarea className="form-control" id="TASKNAME"
+                                                value={formData.TASKNAME}
                                                 disabled={accion === "prorrogar"}
-                                                onChange={(e) => setFormData(prev => ({ ...prev, tarea: e.target.value }))}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, TASKNAME: e.target.value }))}
                                                 required></textarea>
                                             <label>Tarea</label>
                                         </div>
@@ -313,20 +345,20 @@ function ListTask() {
                                     <div className="row mb-3">
                                         <div className="col">
                                             <div className="form-floating">
-                                                <input type="date" className="form-control" id="fechaInicio"
-                                                    value={formData.fechaInicio}
+                                                <input type="date" className="form-control" id="STARTDAY"
+                                                    value={formData.STARTDAY}
                                                     disabled={accion === "prorrogar"}
-                                                    onChange={(e) => setFormData(prev => ({ ...prev, fechaInicio: e.target.value }))}
+                                                    onChange={(e) => setFormData(prev => ({ ...prev, STARTDAY: e.target.value }))}
                                                     required />
                                                 <label>Fecha Inicio</label>
                                             </div>
                                         </div>
                                         <div className="col">
                                             <div className="form-floating">
-                                                <input type="date" className="form-control" id="fechaFin"
-                                                    value={formData.fechaFin}
+                                                <input type="date" className="form-control" id="ENDDAY"
+                                                    value={formData.ENDDAY}
                                                     disabled={accion === "editar"}
-                                                    onChange={(e) => setFormData(prev => ({ ...prev, fechaFin: e.target.value }))}
+                                                    onChange={(e) => setFormData(prev => ({ ...prev, ENDDAY: e.target.value }))}
                                                     required />
                                                 <label>Fecha Fin</label>
                                             </div>

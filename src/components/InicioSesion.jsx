@@ -1,80 +1,104 @@
-// Importa el hook useNavigate para redireccionar entre rutas
 import { useNavigate } from 'react-router-dom';
-// Importa los hooks useState y useEffect para manejar estado y efectos secundarios
 import { useState, useEffect } from 'react';
+import { loginUser } from '../services/userService';
 
 function InicioSesion() {
-    // Hook para redireccionar programáticamente
     const navigate = useNavigate();
 
-    // Estados locales para capturar el usuario y contraseña del formulario
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
-    // 🔁 Verifica si ya hay sesión iniciada al cargar el componente
     useEffect(() => {
-        const user = localStorage.getItem('userName'); // Busca si hay un usuario guardado en localStorage
-        if (user) {
-            navigate('/list-task'); // Si existe, redirige automáticamente a la página de tareas
+        const userId = localStorage.getItem('user_id');
+        if (userId) {
+            navigate('/list-task');
         }
-    }, [navigate]); // Se ejecuta una sola vez al montar el componente
+    }, [navigate]);
 
-    // Función que se ejecuta al iniciar sesión
-    const inicioSesion = () => {
-        localStorage.setItem('userName', username); // Guarda el nombre de usuario en localStorage
-        navigate('/list-task'); // Redirige a la página de tareas
+    const inicioSesion = async (e) => {
+        e.preventDefault();
+        setErrorMessage('');
+
+        try {
+            const response = await loginUser({
+                email,
+                password
+            });
+
+            const user = response.data.user;
+
+            localStorage.setItem('user_id', user.ID);
+            localStorage.setItem('userEmail', user.EMAIL);
+
+            navigate('/list-task');
+
+        } catch (err) {
+            console.error("Error login:", err);
+
+            // 🔥 Aquí capturamos el mensaje real del backend
+            if (err.response && err.response.data && err.response.data.message) {
+                setErrorMessage(err.response.data.message);
+            } else {
+                setErrorMessage("Error de conexión con el servidor");
+            }
+        }
     };
 
     return (
         <div className="w-100 login">
             <div className="centrar h-100">
                 <div className="p-4 bg-login rounded w-30">
-                    {/* Título del formulario */}
+
                     <div className="centrar color-title">
                         <h1>INICIAR SESIÓN</h1>
                     </div>
 
-                    {/* Formulario de inicio de sesión */}
-                    <form className="mt-4 inicio-form needs-validation" id="inicio-form" action={inicioSesion}>
-                        {/* Campo de usuario */}
+                    <form
+                        className="mt-4 inicio-form needs-validation"
+                        onSubmit={inicioSesion}
+                    >
                         <div className="form-floating">
                             <input
-                                type="text"
+                                type="email"
                                 className="form-control inputLogin1"
-                                placeholder="nombre.apellido"
-                                name="username"
+                                placeholder="correo@ejemplo.com"
                                 required
-                                onChange={(e) => setUsername(e.target.value)} // Actualiza el estado con el valor ingresado
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                             />
-                            <label>Usuario</label>
+                            <label>Correo electrónico</label>
                         </div>
 
-                        {/* Campo de contraseña */}
                         <div className="form-floating inputLogin2">
                             <input
                                 type="password"
                                 className="form-control inputLogin2"
                                 placeholder="Password"
-                                name="password"
                                 required
-                                onChange={(e) => setPassword(e.target.value)} // Actualiza el estado con el valor ingresado
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                             />
                             <label>Contraseña</label>
                         </div>
 
-                        {/* Mensaje de error oculto por defecto */}
-                        <div className="alert alert-danger mt-3 d-none" id="error" role="alert">
-                            Error al iniciar sesión. Por favor confirme las credenciales. Si el problema persiste,
-                            comuníquese con el equipo de sistemas.
-                        </div>
+                        {/* 🔥 Ahora muestra el mensaje real del backend */}
+                        {errorMessage && (
+                            <div className="alert alert-danger mt-3" role="alert">
+                                {errorMessage}
+                            </div>
+                        )}
 
-                        {/* Botón para enviar el formulario */}
                         <div className="row align-items-center mt-3">
                             <div className="col-12 centrar">
-                                <button className="btn btn-success">iniciar sesión</button>
+                                <button className="btn btn-success" type="submit">
+                                    Iniciar sesión
+                                </button>
                             </div>
                         </div>
+
                     </form>
+
                 </div>
             </div>
         </div>

@@ -2,56 +2,50 @@
 import { useState } from "react";
 // Importa el componente de navegación
 import Menu from "./Menu";
+import {
+    getTasksByUser,
+    getTasksByUserAndCategory
+} from "../services/taskService";
+import { getCategoriesByUser } from "../services/categoryService"
+import { useEffect } from "react";
+
 
 function Reportes() {
-    // Lista fija de tareas (simula datos que podrían venir de una API o localStorage)
-    const tareas = [
-        {
-            id: 1,
-            categoria: 1,
-            tarea: 'Tarea 1',
-            fechaInicio: '2025-01-01',
-            fechaFin: '2025-01-31'
-        },
-        {
-            id: 2,
-            categoria: 2,
-            tarea: 'Tarea 2',
-            fechaInicio: '2025-02-01',
-            fechaFin: '2025-02-28'
-        },
-        {
-            id: 3,
-            categoria: 3,
-            tarea: 'Tarea 3',
-            fechaInicio: '2025-03-01',
-            fechaFin: '2025-03-31'
-        },
-        {
-            id: 4,
-            categoria: 3,
-            tarea: 'Tarea 4',
-            fechaInicio: '2025-04-01',
-            fechaFin: '2025-04-30'
-        },
-    ];
+    const userId = localStorage.getItem('user_id');
+    // Lista fija de tareas
+    const [tareas, setTareas] = useState([]);
 
-    // Estado que contiene las tareas que se mostrarán (filtradas o todas)
-    const [tareasMostrar, setTareasMostrar] = useState(tareas);
+    useEffect(() => {
+        listarTareas();
+    }, []);
+
+    const listarTareas = async (idCategria) => {
+        try {
+            if (idCategria && idCategria != 0 ) {
+                const response = await getTasksByUserAndCategory(userId, idCategria);
+                setTareas(response.data);
+            }else{
+                const response = await getTasksByUser(userId);
+                setTareas(response.data);
+            }
+        } catch (error) {
+            console.error("Error al listar tareas:", error);
+        }
+    };
 
     // Lista fija de categorías disponibles
-    const listCategoria = [
-        { id: 1, nombre: 'Categoria 1', diasAlerta: 4 },
-        { id: 2, nombre: 'Categoria 2', diasAlerta: 4 },
-        { id: 3, nombre: 'Categoria 3', diasAlerta: 4 },
-    ];
+    const [listCategoria, setCategoria] = useState([]);
 
-    // Función para filtrar tareas por categoría
-    const filtar = (idCategria) => {
-        if (idCategria === 0) {
-            setTareasMostrar(tareas); // Mostrar todas si se selecciona "0"
-        } else {
-            setTareasMostrar(tareas.filter(t => t.categoria === idCategria));
+    useEffect(() => {
+        listarCategoria();
+    }, []);
+
+    const listarCategoria = async () => {
+        try {
+            const response = await getCategoriesByUser(userId);
+            setCategoria(response.data);
+        } catch (error) {
+            console.error("Error al listar categorias:", error);
         }
     };
 
@@ -67,12 +61,12 @@ function Reportes() {
                         <select
                             className="form-select"
                             id="categoria"
-                            onChange={(e) => filtar(parseInt(e.target.value))}
+                            onChange={(e) => listarTareas(parseInt(e.target.value))}
                         >
                             <option value="0">Seleccione una categoría</option>
                             {listCategoria.map((cat) => (
-                                <option key={cat.id} value={cat.id}>
-                                    {cat.nombre}
+                                <option key={cat.ID} value={cat.ID}>
+                                    {cat.CATEGORYNAME}
                                 </option>
                             ))}
                         </select>
@@ -91,33 +85,33 @@ function Reportes() {
                     <div className="col-6 col-md border bg-primary text-white p-1">
                         <p className="centrar">Tarea</p>
                     </div>
-                    <div className="col-1 border bg-primary text-white p-1 d-none d-lg-block">
+                    <div className="col-2 border bg-primary text-white p-1 d-none d-lg-block">
                         <p className="centrar">Fecha Inicio</p>
                     </div>
-                    <div className="col-1 border bg-primary text-white p-1 d-none d-lg-block">
+                    <div className="col-2 border bg-primary text-white p-1 d-none d-lg-block">
                         <p className="centrar">Fecha Fin</p>
                     </div>
                 </div>
 
                 {/* Renderizado dinámico de tareas filtradas */}
-                {tareasMostrar.map((tarea, indice) => {
-                    const categoria = listCategoria.find(cat => cat.id === tarea.categoria);
+                {tareas.map((tarea, indice) => {
+                    const categoria = listCategoria.find(cat => cat.ID === tarea.CATEGORIES_ID);
                     return (
-                        <div className="row ms-2 me-2" key={tarea.id}>
+                        <div className="row ms-2 me-2" key={tarea.ID}>
                             <div className="col-1 border bg-white p-1 position-relative">
                                 <p className="centrar">{indice + 1}</p>
                             </div>
                             <div className="col-2 border bg-white p-1 d-none d-lg-block position-relative">
-                                <p className="centrar">{categoria.nombre}</p>
+                                <p className="centrar">{categoria ? categoria.CATEGORYNAME : "Sin categoría"}</p>
                             </div>
                             <div className="col-6 col-md border bg-white p-1 position-relative">
-                                <p className="centrar">{tarea.tarea}</p>
+                                <p className="centrar">{tarea.TASKNAME}</p>
                             </div>
-                            <div className="col-1 border bg-white p-1 position-relative d-none d-lg-block">
-                                <p className="centrar">{tarea.fechaInicio}</p>
+                            <div className="col-2 border bg-white p-1 position-relative d-none d-lg-block">
+                                <p className="centrar">{tarea.STARTDAY}</p>
                             </div>
-                            <div className="col-1 col-lg-1 border bg-white position-relative d-none d-lg-block">
-                                <p className="centrar">{tarea.fechaFin}</p>
+                            <div className="col-2 border bg-white position-relative d-none d-lg-block">
+                                <p className="centrar">{tarea.ENDDAY}</p>
                             </div>
                         </div>
                     );

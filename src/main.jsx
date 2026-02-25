@@ -13,7 +13,7 @@ import './index.css';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {/* Habilita el enrutamiento en toda la app */}
-    <BrowserRouter>
+    <BrowserRouter basename="/task-alert">
       {/* Componente raíz de la aplicación */}
       <App />
     </BrowserRouter>
