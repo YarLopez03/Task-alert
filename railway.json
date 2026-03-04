@@ -1,9 +1,0 @@
-echo '{
-  "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "npm install --legacy-peer-deps && npm run build"
-  },
-  "deploy": {
-    "startCommand": "npm run start"
-  }
-}' > railway.json
