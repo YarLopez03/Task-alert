@@ -126,15 +126,6 @@ function InicioSesion() {
                                 </div>
                             </div>
                         </div>
-
-                        <div className="row align-items-center mt-3">
-                            <div className="col-12 centrar">
-                                <button className="btn btn-success" type="button" onClick={crearUsuario}>
-                                    Crear usuario
-                                </button>
-                            </div>
-                        </div>
-
                     </form>
 
                 </div>
