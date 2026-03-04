@@ -1,11 +1,13 @@
+cat > nixpacks.toml << 'EOF'
 [phases.setup]
-nixPkgs = ["nodejs_22"]
+nixPkgs = ["nodejs_latest"]
 
 [phases.install]
-cmds = ["npm install"]
+cmds = ["npm install --legacy-peer-deps"]
 
 [phases.build]
 cmds = ["npm run build"]
 
 [start]
-cmd = "npm start"
+cmd = "npm run start"
+EOF
