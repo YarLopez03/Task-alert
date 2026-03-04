@@ -1,0 +1,2 @@
+echo '[phases.setup]
+nixPkgs = ["nodejs_22"]' > nixpacks.toml
