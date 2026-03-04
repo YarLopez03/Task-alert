@@ -1,2 +1,4 @@
-echo '[phases.setup]
-nixPkgs = ["nodejs_22"]' > nixpacks.toml
+cat > nixpacks.toml << 'EOF'
+[phases.setup]
+nixPkgs = ["nodejs_22"]
+EOF
