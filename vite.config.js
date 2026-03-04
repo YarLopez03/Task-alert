@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/task-alert/',
+  base: '/',
   preview: {
     allowedHosts: ['task-alert-production.up.railway.app']
   }
