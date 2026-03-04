@@ -116,9 +116,14 @@ function InicioSesion() {
 
                         <div className="row align-items-center mt-3">
                             <div className="col-12 centrar">
-                                <button className="btn btn-success" type="submit">
-                                    Iniciar sesión
-                                </button>
+                                <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                    <button className="btn btn-success" type="submit">
+                                        Iniciar sesión
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onClick={crearUsuario}>
+                                        Crear usuario
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
