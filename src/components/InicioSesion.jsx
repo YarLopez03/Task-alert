@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { loginUser } from '../services/userService';
+import { loginUser, registerUser } from '../services/userService';
 
 function InicioSesion() {
     const navigate = useNavigate();
@@ -37,6 +37,31 @@ function InicioSesion() {
             console.error("Error login:", err);
 
             // 🔥 Aquí capturamos el mensaje real del backend
+            if (err.response && err.response.data && err.response.data.message) {
+                setErrorMessage(err.response.data.message);
+            } else {
+                setErrorMessage("Error de conexión con el servidor");
+            }
+        }
+    };
+
+    const crearUsuario = async () => {
+        setErrorMessage('');
+
+        // Validar que los campos no estén vacíos
+        if (!email || !password) {
+            setErrorMessage("Por favor completa el correo y la contraseña.");
+            return;
+        }
+
+        try {
+            const response = await registerUser({ email, password });
+            const user = response.data.user;
+            localStorage.setItem('user_id', user.ID);
+            localStorage.setItem('userEmail', user.EMAIL);
+            navigate('/list-task');
+        } catch (err) {
+            console.error("Error registro:", err);
             if (err.response && err.response.data && err.response.data.message) {
                 setErrorMessage(err.response.data.message);
             } else {
@@ -93,6 +118,14 @@ function InicioSesion() {
                             <div className="col-12 centrar">
                                 <button className="btn btn-success" type="submit">
                                     Iniciar sesión
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="row align-items-center mt-3">
+                            <div className="col-12 centrar">
+                                <button className="btn btn-success" type="button" onClick={crearUsuario}>
+                                    Crear usuario
                                 </button>
                             </div>
                         </div>
