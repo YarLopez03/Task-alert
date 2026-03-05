@@ -46,29 +46,31 @@ function InicioSesion() {
     };
 
     const crearUsuario = async () => {
-        setErrorMessage('');
+    setErrorMessage('');
 
-        // Validar que los campos no estén vacíos
-        if (!email || !password) {
-            setErrorMessage("Por favor completa el correo y la contraseña.");
-            return;
-        }
+    if (!email || !password) {
+        setErrorMessage("Por favor completa el correo y la contraseña.");
+        return;
+    }
 
-        try {
-            const response = await registerUser({ email, password });
-            const user = response.data.user;
-            localStorage.setItem('user_id', user.ID);
-            localStorage.setItem('userEmail', user.EMAIL);
-            navigate('/list-task');
-        } catch (err) {
-            console.error("Error registro:", err);
-            if (err.response && err.response.data && err.response.data.message) {
-                setErrorMessage(err.response.data.message);
-            } else {
-                setErrorMessage("Error de conexión con el servidor");
-            }
+    try {
+        const response = await registerUser({ email, password });
+        const user = response.data.user;
+
+        localStorage.setItem('user_id', user.ID);
+        localStorage.setItem('userEmail', user.EMAIL);
+
+        navigate('/list-task');
+
+    } catch (err) {
+        console.error("Error registro:", err);
+        if (err.response && err.response.data && err.response.data.message) {
+            setErrorMessage(err.response.data.message);
+        } else {
+            setErrorMessage("Error de conexión con el servidor");
         }
-    };
+    }
+};
 
     return (
         <div className="w-100 login">
